@@ -1,0 +1,106 @@
+<?php
+//Database connection
+  include_once("config.php");
+  //Add comments
+  if (isset($_POST['submit'])) {
+    # code...
+    $usercmt=$_POST['comment'];
+    $name=$_POST['username'];
+    if (empty($usercmt)||empty($name)) {
+      # code...
+      if (empty($usercmt)) {
+        # code...
+        echo "comment field is empty";
+      }
+      if (empty($name)) {
+        # code...
+        echo "Name field is empty";
+    }
+  }else{
+    $result=mysql_query("INSERT INTO comments(name,comment,post_time) VALUES(''$name',$usercmt',CURRENT_TIMESTAMP)");
+    echo "add data";
+  }
+  
+}
+?>
+<html>
+  <head>
+  <script type="text/javascript" src="jquery.js">
+<script type="text/javascript">
+function post()
+{
+  var comment = document.getElementById("comment").value;
+  var name = document.getElementById("username").value;
+  if(comment && name)
+  {
+    $.ajax
+    ({
+      type: 'post',
+      url: 'postcomment.php',
+      data: 
+      {
+         user_comm:comment,
+       user_name:name
+      },
+      success: function (response) 
+      {
+      document.getElementById("all_comments").innerHTML=response+document.getElementById("all_comments").innerHTML;
+      document.getElementById("comment").value="";
+        document.getElementById("username").value="";
+  
+      }
+    });
+  }
+  
+  return false;
+}
+</script>
+  </head>
+  <body>
+        <form method='post' action="" onsubmit="return post();">
+        <textarea id="comment" name="comment"placeholder="Write Your Comment Here....."></textarea>
+        <br>
+        <input type="text" id="username" name="username" placeholder="Your Name">
+        <br>
+        <input type="submit" name="submit" value="Post Comment">
+        </form>
+        <div id="all_comments">
+  <?php
+    $host="localhost";
+    $username="root";
+    $password="";
+    $databasename="sample";
+
+    $connect=mysql_connect($host,$username,$password);
+    $db=mysql_select_db($databasename);
+  
+    $comm = mysql_query("select name,comment,post_time from comments order by post_time desc");
+    while($row=mysql_fetch_array($comm))
+    {
+    $name=$row['name'];
+    $comment=$row['comment'];
+    $time=$row['post_time'];
+    ?>
+  
+  <div class="comment_div"> 
+    <p class="name">Posted By:<?php echo  $name;?></p>
+      <p class="comment"><?php echo $comment;?></p> 
+    <p class="time"><?php echo $time;?></p>
+  </div>
+  
+    <?php
+    }
+    ?>
+  </body>
+  
+</html>
+-----------------------------------------------------
+Database:
+
+CREATE TABLE `comments` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `name` text NOT NULL,
+ `comment` text NOT NULL,
+ `post_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=latin1

@@ -1,0 +1,91 @@
+<?php
+
+   // error_reporting( ~E_NOTICE ); // avoid notice
+    
+    include_once ('dbconnect.php');
+    
+    if(isset($_POST['btnsave']))
+    {
+        $ausername = $_POST['username'];// user name
+        $auserid = $_POST['userid'];// user email
+        $auserpass = $_POST['userpass'];//userpass
+        
+        $imgFile = $_FILES['user_image']['name'];
+        $tmp_dir = $_FILES['user_image']['tmp_name'];
+        $imgSize = $_FILES['user_image']['size'];
+        
+        
+        if(empty($ausername)){
+            $errMSG = "Please Enter Username.";
+        }
+        else if(empty($auserid)){
+            $errMSG = "Please Enter Your userid.";
+        }
+        else if(empty($auserpass)){
+            $errMSG = "Please Enter Your Password.";
+        }
+        else if(empty($imgFile)){
+            $errMSG = "Please Select Image File.";
+        }
+        else
+        {
+            $upload_dir = 'img/'; // upload directory
+    
+            $imgExt = strtolower(pathinfo($imgFile,PATHINFO_EXTENSION)); // get image extension
+        
+            // valid image extensions
+            $valid_extensions = array('jpeg', 'jpg', 'png', 'gif'); // valid extensions
+        
+            // rename uploading image
+            $userpic = rand(1000,1000000).".".$imgExt;
+                
+            // allow valid image file formats
+            if(in_array($imgExt, $valid_extensions)){           
+                // Check file size '5MB'
+                if($imgSize < 5000000)              {
+                    move_uploaded_file($tmp_dir,$upload_dir.$userpic);
+                }
+                else{
+                    $errMSG = "Sorry, your file is too large.";
+                }
+            }
+            else{
+                $errMSG = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";        
+            }
+        }
+        
+        
+        // if no error occured, continue ....
+        if(!isset($errMSG))
+        {
+            $result = mysql_query("INSERT INTO areg(auserid,ausername,auserpass,aimg) VALUES('$auserid','$ausername', '$auserpass', '$imgFile')");
+           /* $stmt = $DB_con->prepare('INSERT INTO areg(auserid,ausername,auserpass,aimg) VALUES(:auserid, :ausername, :auserpass, :upic)');
+            $stmt->bindParam(':auserid',$auserid);
+            $stmt->bindParam(':ausername',$ausername);
+            $stmt->bindParam(':auserpass',$auserpass);
+            $stmt->bindParam(':upic',$userpic);*/
+            
+            /*if($result==execute())
+            {
+                $successMSG = "new record succesfully inserted ...";
+                header("refresh:5;index.php"); // redirects image view page after 5 seconds.
+                echo "ok";
+            }
+            else
+            {
+                $errMSG = "error while inserting....";
+                echo "not ok";
+            }*/
+            echo "<font color='green'>Data added successfully.";
+        }
+    }
+?>
+-----------------------------------------------------------------
+
+                        <!--Upload Images-->
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Upload Image</label>
+                            <div class="col-md-10">
+                                <input class="input-group" type="file" name="user_image" accept="image/*" />
+                            </div>
+                        </div>
